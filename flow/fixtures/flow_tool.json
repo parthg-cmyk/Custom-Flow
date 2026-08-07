@@ -1,0 +1,18 @@
+[
+ {
+  "code": "def main(employee: str, personal_message: str) -> dict:\n\temp = frappe.get_doc(\"Employee\", employee)\n\tto_email = emp.personal_email or emp.company_email or emp.user_id\n\tif not to_email:\n\t\tfrappe.throw(f\"Employee {emp.name} has no email on file.\")\n\n\ttemplate = frappe.get_doc(\"Email Template\", \"Onboarding Welcome\")\n\tcontext = {\n\t\t\"employee\": emp,\n\t\t\"portal_link\": frappe.utils.get_url(\"/onboarding-documents\"),\n\t\t\"personal_message\": personal_message,\n\t}\n\tsubject = frappe.render_template(template.subject, context)\n\tmessage = frappe.render_template(template.response, context)\n\n\tfrappe.sendmail(\n\t\trecipients=[to_email],\n\t\tsubject=subject,\n\t\tmessage=message,\n\t\tnow=True,\n\t\treference_doctype=\"Employee\",\n\t\treference_name=emp.name,\n\t)\n\treturn {\"sent_to\": to_email, \"subject\": subject}\n",
+  "description": "Sends the 'Onboarding Welcome' email to a newly created Employee, with a short personal message and a link to the document-upload portal. Call this exactly once, after the Employee record exists. `personal_message` should be 2-4 warm sentences built only from facts already gathered about this hire (role, department, start date) — never invent details. Returns the recipient address and rendered subject.",
+  "docstatus": 0,
+  "doctype": "Flow Tool",
+  "enabled": 1,
+  "import_path": null,
+  "is_system_generated": 0,
+  "modified": "2026-08-07 14:36:18.372205",
+  "name": "send_onboarding_welcome_email",
+  "requires_confirmation": 1,
+  "slug": "send_onboarding_welcome_email",
+  "summary": "Renders the Onboarding Welcome email template and sends it via frappe.sendmail.",
+  "title": "Send Onboarding Welcome Email",
+  "type": "Script"
+ }
+]

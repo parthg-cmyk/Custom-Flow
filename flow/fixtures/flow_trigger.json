@@ -1,0 +1,20 @@
+[
+ {
+  "agent": "Onboarding Agent",
+  "auto_approve": 1,
+  "condition": null,
+  "cron_expression": null,
+  "doc_event": "after_insert",
+  "docstatus": 0,
+  "doctype": "Flow Trigger",
+  "enabled": 1,
+  "event": "DocType Event",
+  "last_fired_at": null,
+  "modified": "2026-08-07 15:58:35.969032",
+  "name": "Onboarding Agent - New Employee Onboarding",
+  "prompt_template": "New Employee Onboarding created: {{ doc.name }} for {{ doc.employee_name }} (Job Applicant {{ doc.job_applicant }}). Begin onboarding.",
+  "run_as": "Administrator",
+  "target_doctype": "Employee Onboarding",
+  "title": "Onboarding Agent - New Employee Onboarding"
+ }
+]

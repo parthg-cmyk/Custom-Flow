@@ -1,0 +1,44 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Identification Document Type",
+  "identification_document_type": "Identity Proof",
+  "modified": "2026-08-07 14:36:17.996180",
+  "name": "Identity Proof"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Identification Document Type",
+  "identification_document_type": "Address Proof",
+  "modified": "2026-08-07 14:36:18.032525",
+  "name": "Address Proof"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Identification Document Type",
+  "identification_document_type": "Education Certificates",
+  "modified": "2026-08-07 14:36:18.034777",
+  "name": "Education Certificates"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Identification Document Type",
+  "identification_document_type": "Previous Employment Relieving Letter",
+  "modified": "2026-08-07 14:36:18.037615",
+  "name": "Previous Employment Relieving Letter"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Identification Document Type",
+  "identification_document_type": "Bank Details / Cancelled Cheque",
+  "modified": "2026-08-07 14:36:18.040323",
+  "name": "Bank Details / Cancelled Cheque"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Identification Document Type",
+  "identification_document_type": "Passport Photograph",
+  "modified": "2026-08-07 14:36:18.042535",
+  "name": "Passport Photograph"
+ }
+]

@@ -1,0 +1,12 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Email Template",
+  "modified": "2026-08-07 14:36:18.295597",
+  "name": "Onboarding Welcome",
+  "response": "<p>Hi {{ employee.first_name }},</p><p>{{ personal_message }}</p><p>To get started, please upload your onboarding documents here: <a href=\"{{ portal_link }}\" rel=\"noopener noreferrer\">{{ portal_link }}</a></p><p>Welcome aboard!</p>",
+  "response_html": null,
+  "subject": "Welcome to {{ employee.company }}, {{ employee.first_name }}!",
+  "use_html": 0
+ }
+]
