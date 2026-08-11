@@ -357,6 +357,18 @@ class FlowSession(Document):
 				messages[0]["content"] = f"{messages[0]['content']}\n\n{memory_block}"
 			else:
 				messages.insert(0, {"role": "system", "content": memory_block})
+
+		# The stored system message (persisted once, on the session's first turn) never
+		# carries a date — only a Trigger's own rendered prompt_template happens to mention
+		# `now`. Without this, the model has no way to know the real current date and will
+		# guess one (seen guessing years-old dates for "this month"-style relative
+		# requests). Ephemeral and recomputed every call, like the memory block above, so
+		# it can never go stale across a long-running session.
+		today_line = f"Today's date is {frappe.utils.today()}."
+		if messages and messages[0]["role"] == "system":
+			messages[0]["content"] = f"{today_line}\n\n{messages[0]['content']}"
+		else:
+			messages.insert(0, {"role": "system", "content": today_line})
 		return messages
 
 	def _latest_user_run(self) -> str | None:

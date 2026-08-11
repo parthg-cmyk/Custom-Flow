@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import contextlib
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -12,6 +13,37 @@ if TYPE_CHECKING:
 	from frappe.model.document import Document
 
 DOC_EVENTS = frozenset({"after_insert", "on_update", "on_submit", "on_cancel", "on_trash"})
+
+
+@contextlib.contextmanager
+def _as_user(user: str):
+	"""Temporarily switch the current request/job's identity to `user`, then fully restore the
+	original one — used any time a trigger runs its condition or its agent as a configured
+	run_as/owner rather than the actual caller.
+
+	frappe.set_user does much more than swap frappe.session.user: it also stamps
+	frappe.local.session.sid to the given username (a literal string, never a real session id)
+	and wipes session.data, local.cache, local.role_permissions, local.user_perms,
+	local.new_doc_templates, and local.form_dict. Restoring only `user` (or `user` + `sid`)
+	still leaves session.data emptied — missing user_type/session_expiry/full_name/etc that a
+	real login sets. Whatever persists session state back to the database at request/job
+	teardown then writes that impoverished blob under the real caller's own sid, permanently
+	corrupting their live session: the next request looks unauthenticated even though the raw
+	user/sid columns look fine on inspection, forcing them to log back in. Snapshot and restore
+	the whole set, not one field at a time.
+	"""
+	original_user = frappe.session.user
+	original_sid = frappe.local.session.sid
+	original_data = frappe.local.session.data
+	original_form_dict = frappe.local.form_dict
+	frappe.set_user(user)
+	try:
+		yield
+	finally:
+		frappe.set_user(original_user)
+		frappe.local.session.sid = original_sid
+		frappe.local.session.data = original_data
+		frappe.local.form_dict = original_form_dict
 
 
 def dispatch(doc: Document, method: str | None = None) -> None:
@@ -70,10 +102,9 @@ def fire(
 	if not t.enabled:
 		return None
 
-	# A trigger runs as its configured `run_as` user (falling back to the owner)
-	original_user = frappe.session.user
-	frappe.set_user(t.run_as or t.owner)
-	try:
+	# A trigger runs as its configured `run_as` user (falling back to the owner) — see _as_user
+	# above for why this can't be a plain frappe.set_user()/restore pair.
+	with _as_user(t.run_as or t.owner or "Administrator"):
 		doc = None
 		if target_doctype and target_name:
 			try:
@@ -94,8 +125,6 @@ def fire(
 			auto_approve=bool(t.auto_approve),
 		)
 		return run.name
-	finally:
-		frappe.set_user(original_user)
 
 
 def _doctype_triggers(target_doctype: str, doc_event: str) -> list:
@@ -114,13 +143,14 @@ def _doctype_triggers(target_doctype: str, doc_event: str) -> list:
 def _passes_condition(trigger, doc: Document) -> bool:
 	"""Evaluate the pre-enqueue condition as the trigger's run identity (matching fire),
 	so a permission-sensitive condition doesn't silently under-fire for the low-privilege
-	user whose action triggered it."""
-	original_user = frappe.session.user
-	frappe.set_user(trigger.run_as or trigger.owner)
-	try:
+	user whose action triggered it.
+
+	This runs synchronously, inline in the request that triggered it (unlike `fire`, which
+	runs in its own background job) — so the identity swap must not leak out into that
+	request's real session. See _as_user above for what that actually requires restoring.
+	"""
+	with _as_user(trigger.run_as or trigger.owner or "Administrator"):
 		return _eval_condition(trigger.condition, doc)
-	finally:
-		frappe.set_user(original_user)
 
 
 def _eval_condition(condition: str, doc: Document) -> bool:

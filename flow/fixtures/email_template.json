@@ -8,5 +8,25 @@
   "response_html": null,
   "subject": "Welcome to {{ employee.company }}, {{ employee.first_name }}!",
   "use_html": 0
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Email Template",
+  "modified": "2026-08-10 12:01:41.352169",
+  "name": "Offboarding Notice",
+  "response": "<p>Hi {{ employee.first_name or employee.employee_name }},</p><p>{{ personal_message }}</p><p>Please arrange to return any company assets you're holding — HR will confirm receipt of each item.</p><p>Thank you for everything, and best of luck ahead.</p>",
+  "response_html": null,
+  "subject": "Offboarding checklist for {{ employee.employee_name }}",
+  "use_html": 0
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Email Template",
+  "modified": "2026-08-10 14:42:55.932940",
+  "name": "Leave Decision",
+  "response": "<p>Hi {{ employee.first_name or employee.employee_name }},</p><p>Your leave request ({{ leave_application.leave_type }}, {{ leave_application.from_date }} to {{ leave_application.to_date }}) has been <strong>{{ decision }}</strong>.</p><p>{{ reason }}</p>",
+  "response_html": null,
+  "subject": "Your {{ leave_application.leave_type }} request has been {{ decision }}",
+  "use_html": 0
  }
 ]

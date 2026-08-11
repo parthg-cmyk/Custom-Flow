@@ -1,0 +1,98 @@
+[
+ {
+  "allow_tax_exemption": 1,
+  "amended_from": null,
+  "company": "STPL",
+  "currency": "INR",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Income Tax Slab",
+  "effective_from": "2026-04-01",
+  "marginal_relief_limit": 0.0,
+  "modified": "2026-08-10 17:11:28.655625",
+  "name": "Old Regime FY 2026-27",
+  "other_taxes_and_charges": [],
+  "slabs": [
+   {
+    "condition": null,
+    "from_amount": 0.0,
+    "percent_deduction": 0.0,
+    "to_amount": 250000.0
+   },
+   {
+    "condition": null,
+    "from_amount": 250000.0,
+    "percent_deduction": 5.0,
+    "to_amount": 500000.0
+   },
+   {
+    "condition": null,
+    "from_amount": 500000.0,
+    "percent_deduction": 20.0,
+    "to_amount": 1000000.0
+   },
+   {
+    "condition": null,
+    "from_amount": 1000000.0,
+    "percent_deduction": 30.0,
+    "to_amount": 0.0
+   }
+  ],
+  "standard_tax_exemption_amount": 50000.0,
+  "tax_relief_limit": 500000.0
+ },
+ {
+  "allow_tax_exemption": 0,
+  "amended_from": null,
+  "company": "STPL",
+  "currency": "INR",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Income Tax Slab",
+  "effective_from": "2026-04-01",
+  "marginal_relief_limit": 0.0,
+  "modified": "2026-08-10 17:11:28.667927",
+  "name": "New Regime FY 2026-27",
+  "other_taxes_and_charges": [],
+  "slabs": [
+   {
+    "condition": null,
+    "from_amount": 0.0,
+    "percent_deduction": 0.0,
+    "to_amount": 300000.0
+   },
+   {
+    "condition": null,
+    "from_amount": 300000.0,
+    "percent_deduction": 5.0,
+    "to_amount": 600000.0
+   },
+   {
+    "condition": null,
+    "from_amount": 600000.0,
+    "percent_deduction": 10.0,
+    "to_amount": 900000.0
+   },
+   {
+    "condition": null,
+    "from_amount": 900000.0,
+    "percent_deduction": 15.0,
+    "to_amount": 1200000.0
+   },
+   {
+    "condition": null,
+    "from_amount": 1200000.0,
+    "percent_deduction": 20.0,
+    "to_amount": 1500000.0
+   },
+   {
+    "condition": null,
+    "from_amount": 1500000.0,
+    "percent_deduction": 30.0,
+    "to_amount": 0.0
+   }
+  ],
+  "standard_tax_exemption_amount": 75000.0,
+  "tax_relief_limit": 700000.0
+ }
+]

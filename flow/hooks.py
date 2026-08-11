@@ -61,25 +61,51 @@ after_migrate = ["flow.assistant.sync_builtin_assistant"]
 
 extend_bootinfo = "flow.boot.boot_session"
 
-# Site-specific agent customizations (HR Helpdesk Agent, Onboarding Agent, and their
-# supporting tool/webform/template) exported as data so they can be version controlled
-# and replayed onto another site via `bench --site <site> import-fixtures`. The
-# "Onboarding Document" doctype itself ships as real app code instead (converted from
-# a Custom DocType to module="Flow", custom=0 — see flow/flow/doctype/onboarding_document)
-# since `export-fixtures` refuses to fixture the "DocType" doctype itself.
+# Site-specific agent customizations (HR Helpdesk Agent, Onboarding Agent, Offboarding
+# Agent, Attendance Agent, Payroll Agent, Resume Shortlisting Agent, and their supporting
+# tools/webforms/templates/master lists — including the India payroll framework: Salary
+# Component, Income Tax Slab, Salary Structure, the Company custom fields the
+# HRA-exemption formula reads, and the Job Applicant custom fields (match_score,
+# extracted_skills, screening_summary) the Resume Shortlisting Agent writes to)
+# exported as data so they can be version controlled and replayed onto another site via
+# `bench --site <site> import-fixtures`. The "Onboarding Document" and "Asset Return
+# Activity" doctypes themselves ship as real app code instead (module="Flow", custom=0 —
+# see flow/flow/doctype/onboarding_document and flow/flow/doctype/asset_return_activity)
+# since `export-fixtures` refuses to fixture the "DocType" doctype itself. The Employee
+# Separation.asset_return_activity Table field that uses it, however, IS a Custom Field
+# and travels as a fixture below.
 # Excludes: Flow Model/Flow Provider (hold encrypted, site-specific API credentials —
 # never belong in a git-committed fixture), the system-generated "Flow" agent/builtin
-# tools (recreated automatically by after_migrate, not data to replay), and Flow
-# Knowledge Base/Source/Chunk (reference uploaded files and derived vector embeddings
-# that don't travel with a fixture export — rebuild via re-ingestion on the target site).
+# tools (recreated automatically by after_migrate, not data to replay), Flow Knowledge
+# Base/Source/Chunk (reference uploaded files and derived vector embeddings that don't
+# travel with a fixture export — rebuild via re-ingestion on the target site), and
+# per-employee/per-year/per-company instance data (Leave Allocation, Employee.
+# leave_approver, Holiday List Assignment, Payroll Period, and the Company records'
+# own basic_component/hra_component/default_payroll_payable_account values) — real
+# setup for THIS site's employees/companies/year, not portable "code" to replay onto a
+# different site's different employees. The Income Tax Slab rates are representative
+# figures for a working demo — verify against the current Finance Act before any real
+# payroll run.
 fixtures = [
 	{"dt": "Identification Document Type"},
+	{"dt": "Leave Type", "filters": [["name", "in", ["Casual Leave", "Sick Leave", "Earned Leave", "Leave Without Pay"]]]},
+	{"dt": "Salary Component"},
+	{"dt": "Income Tax Slab", "filters": [["name", "in", ["Old Regime FY 2026-27", "New Regime FY 2026-27"]]]},
+	{"dt": "Salary Structure", "filters": [["name", "=", "Standard - Monthly"]]},
 	{
 		"dt": "Custom Field",
-		"filters": [["dt", "=", "Employee Onboarding"], ["fieldname", "in", ["gender", "date_of_birth"]]],
+		"filters": [
+			["dt", "in", ["Employee Onboarding", "Job Offer", "Company", "Job Applicant", "Employee Separation"]],
+			["fieldname", "in", [
+				"gender", "date_of_birth", "date_of_joining",
+				"hra_section", "basic_component", "hra_component", "hra_column_break", "arrear_component",
+				"match_score", "extracted_skills", "screening_summary",
+				"asset_return_activity",
+			]],
+		],
 	},
-	{"dt": "Email Template", "filters": [["name", "=", "Onboarding Welcome"]]},
-	{"dt": "Web Form", "filters": [["name", "=", "onboarding-documents"]]},
+	{"dt": "Email Template", "filters": [["name", "in", ["Onboarding Welcome", "Offboarding Notice", "Leave Decision"]]]},
+	{"dt": "Web Form", "filters": [["name", "in", ["onboarding-documents"]]]},
 	{"dt": "Flow Tool", "filters": [["is_system_generated", "=", 0]]},
 	{"dt": "Flow Agent", "filters": [["is_system_generated", "=", 0]]},
 	{"dt": "Flow Trigger"},

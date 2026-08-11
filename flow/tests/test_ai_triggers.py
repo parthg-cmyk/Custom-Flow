@@ -366,6 +366,40 @@ class TestFire(IntegrationTestCase):
 			fire(self.trigger.name, target_doctype="ToDo", target_name=todo.name)
 		self.assertEqual(frappe.session.user, "Administrator")
 
+	def test_fire_restores_the_original_session_sid(self):
+		# frappe.set_user unconditionally stamps frappe.local.session.sid to the given username —
+		# even when restoring back to the *original* user, the real random session id is
+		# overwritten with that username string instead. A real browser sid never equals the
+		# username, so simulate one here; the test harness's own sid happens to already equal
+		# "Administrator", which would mask this bug (restoring the user coincidentally "restores"
+		# a sid that matches it). If fire() ever runs inline in a live request rather than a fully
+		# isolated worker (e.g. enqueue_after_commit executing synchronously), leaving this
+		# corrupted invalidates the real caller's session, forcing them to log back in.
+		frappe.local.session.sid = "a-real-random-session-hash-1234"
+		original_sid = frappe.session.sid
+
+		todo = frappe.get_doc({"doctype": "ToDo", "description": "restore sid"}).insert()
+		with patch.object(Model, "chat", return_value=_final("done")):
+			fire(self.trigger.name, target_doctype="ToDo", target_name=todo.name)
+		self.assertEqual(frappe.session.sid, original_sid)
+
+	def test_fire_restores_the_original_session_data(self):
+		# frappe.set_user doesn't just reset user/sid — it also replaces session.data with a
+		# fresh empty dict, wiping user_type/session_expiry/full_name/etc that a real login sets.
+		# Restoring only user+sid still leaves that impoverished session.data in place; whatever
+		# persists session state back to the database at request/job teardown then writes it
+		# under the real caller's own sid, corrupting their live session even though the raw
+		# user/sid columns look fine on inspection — this is what actually caused the reported
+		# logout/"not whitelisted" symptom, not sid alone.
+		frappe.local.session.data.user_type = "System User"
+		frappe.local.session.data.marker = "original-session-data-should-survive"
+		original_data = dict(frappe.local.session.data)
+
+		todo = frappe.get_doc({"doctype": "ToDo", "description": "restore session data"}).insert()
+		with patch.object(Model, "chat", return_value=_final("done")):
+			fire(self.trigger.name, target_doctype="ToDo", target_name=todo.name)
+		self.assertEqual(dict(frappe.session.data), original_data)
+
 	def _execute_then_final(self):
 		from flow.lib.model import ToolCall
 
