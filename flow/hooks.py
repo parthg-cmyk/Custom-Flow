@@ -95,17 +95,19 @@ fixtures = [
 	{
 		"dt": "Custom Field",
 		"filters": [
-			["dt", "in", ["Employee Onboarding", "Job Offer", "Company", "Job Applicant", "Employee Separation"]],
+			["dt", "in", ["Employee Onboarding", "Job Offer", "Company", "Job Applicant", "Employee Separation", "Employee"]],
 			["fieldname", "in", [
 				"gender", "date_of_birth", "date_of_joining",
 				"hra_section", "basic_component", "hra_component", "hra_column_break", "arrear_component",
 				"match_score", "extracted_skills", "screening_summary",
 				"asset_return_activity",
+				"start_offboarding",
 			]],
 		],
 	},
 	{"dt": "Email Template", "filters": [["name", "in", ["Onboarding Welcome", "Offboarding Notice", "Leave Decision"]]]},
 	{"dt": "Web Form", "filters": [["name", "in", ["onboarding-documents"]]]},
+	{"dt": "Client Script", "filters": [["name", "=", "Employee Exit - Start Offboarding"]]},
 	{"dt": "Flow Tool", "filters": [["is_system_generated", "=", 0]]},
 	{"dt": "Flow Agent", "filters": [["is_system_generated", "=", 0]]},
 	{"dt": "Flow Trigger"},

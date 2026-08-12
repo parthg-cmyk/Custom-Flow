@@ -1,0 +1,13 @@
+[
+ {
+  "doctype": "Client Script",
+  "docstatus": 0,
+  "name": "Employee Exit - Start Offboarding",
+  "dt": "Employee",
+  "view": "Form",
+  "module": null,
+  "enabled": 1,
+  "script": "frappe.ui.form.on(\"Employee\", {\n\trefresh(frm) {\n\t\tconst field = frm.fields_dict.start_offboarding;\n\t\tif (!field || frm.doc.status === \"Left\" || frm.is_new()) return;\n\n\t\tfrappe.db.get_value(\"Employee Separation\", { employee: frm.doc.name }, \"name\").then(({ message }) => {\n\t\t\tfrm._offboarding_separation = (message && message.name) || null;\n\t\t\tfield.set_df_property(\"label\", frm._offboarding_separation ? __(\"Offboarding Started\") : __(\"Start Offboarding\"));\n\t\t});\n\t},\n\n\tstart_offboarding(frm) {\n\t\tif (frm._offboarding_separation) {\n\t\t\tfrappe.show_alert({\n\t\t\t\tmessage: __(\"Offboarding was already started for {0}.\", [frm.doc.employee_name]),\n\t\t\t\tindicator: \"blue\",\n\t\t\t});\n\t\t\treturn;\n\t\t}\n\n\t\tfrappe.prompt(\n\t\t\t[\n\t\t\t\t{\n\t\t\t\t\tfieldname: \"relieving_date\",\n\t\t\t\t\tfieldtype: \"Date\",\n\t\t\t\t\tlabel: __(\"Relieving Date\"),\n\t\t\t\t\treqd: 1,\n\t\t\t\t\tdefault: frm.doc.relieving_date || frappe.datetime.get_today(),\n\t\t\t\t},\n\t\t\t],\n\t\t\t(values) => {\n\t\t\t\tfrappe.call({\n\t\t\t\t\tmethod: \"frappe.client.set_value\",\n\t\t\t\t\targs: {\n\t\t\t\t\t\tdoctype: \"Employee\",\n\t\t\t\t\t\tname: frm.doc.name,\n\t\t\t\t\t\tfieldname: \"relieving_date\",\n\t\t\t\t\t\tvalue: values.relieving_date,\n\t\t\t\t\t},\n\t\t\t\t\tfreeze: true,\n\t\t\t\t\tfreeze_message: __(\"Starting offboarding\u2026\"),\n\t\t\t\t\tcallback() {\n\t\t\t\t\t\tfrappe.call({\n\t\t\t\t\t\t\tmethod: \"frappe.client.insert\",\n\t\t\t\t\t\t\targs: {\n\t\t\t\t\t\t\t\tdoc: {\n\t\t\t\t\t\t\t\t\tdoctype: \"Employee Separation\",\n\t\t\t\t\t\t\t\t\temployee: frm.doc.name,\n\t\t\t\t\t\t\t\t\tboarding_begins_on: frappe.datetime.get_today(),\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tcallback(r) {\n\t\t\t\t\t\t\t\tif (!r.message) return;\n\t\t\t\t\t\t\t\tfrm._offboarding_separation = r.message.name;\n\t\t\t\t\t\t\t\tfrm.fields_dict.start_offboarding.set_df_property(\"label\", __(\"Offboarding Started\"));\n\t\t\t\t\t\t\t\tfrappe.show_alert({\n\t\t\t\t\t\t\t\t\tmessage: __(\"Offboarding started for {0}.\", [frm.doc.employee_name]),\n\t\t\t\t\t\t\t\t\tindicator: \"green\",\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\tfrm.reload_doc();\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t});\n\t\t\t\t\t},\n\t\t\t\t});\n\t\t\t},\n\t\t\t__(\"Set Relieving Date\"),\n\t\t\t__(\"Start Offboarding\")\n\t\t);\n\t},\n});\n",
+  "modified": "2026-08-12 11:30:00.000000"
+ }
+]

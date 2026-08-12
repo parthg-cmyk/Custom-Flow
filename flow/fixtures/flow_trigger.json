@@ -20,20 +20,20 @@
  {
   "agent": "Offboarding Agent",
   "auto_approve": 1,
-  "condition": "doc.has_value_changed(\"status\") and doc.status == \"Left\"",
+  "condition": null,
   "cron_expression": null,
-  "doc_event": "on_update",
+  "doc_event": "after_insert",
   "docstatus": 0,
   "doctype": "Flow Trigger",
   "enabled": 1,
   "event": "DocType Event",
   "last_fired_at": null,
-  "modified": "2026-08-10 12:01:41.447782",
-  "name": "Offboarding Agent - Employee Left",
-  "prompt_template": "Employee {{ doc.name }} ({{ doc.employee_name }}) marked as Left, relieving date {{ doc.relieving_date }}. Begin offboarding.",
+  "modified": "2026-08-11 12:00:00.000000",
+  "name": "Offboarding Agent - Employee Separation Created",
+  "prompt_template": "Employee Separation {{ doc.name }} created for {{ doc.employee_name }} ({{ doc.employee }}), boarding begins {{ doc.boarding_begins_on }}. Begin offboarding.",
   "run_as": "Administrator",
-  "target_doctype": "Employee",
-  "title": "Offboarding Agent - Employee Left"
+  "target_doctype": "Employee Separation",
+  "title": "Offboarding Agent - Employee Separation Created"
  },
  {
   "agent": "Attendance Agent",
